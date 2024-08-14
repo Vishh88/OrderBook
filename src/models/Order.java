@@ -1,6 +1,6 @@
-package Models;
+package models;
 
-import Generators.UIDGenerator;
+import generators.UIDGenerator;
 
 public class Order {
 	private String Id = UIDGenerator.nextUID();

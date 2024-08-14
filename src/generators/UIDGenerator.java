@@ -1,4 +1,4 @@
-package Generators;
+package generators;
 import java.rmi.server.UID;
 
 public class UIDGenerator {
