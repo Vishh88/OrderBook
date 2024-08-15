@@ -135,7 +135,7 @@ public class Operations {
 		} 
 	}
 
-	public void PrintList(LinkedList<Order> list) {
+	public void PrintData(LinkedList<Order> list) {
 		if (list.isEmpty()) {
 			System.out.println("List is empty, nothing to print.");
 		} else {
@@ -148,7 +148,7 @@ public class Operations {
 		}
 	}
 	
-	public void PrintMap(TreeMap<Double, LinkedList<Order>> map) {
+	public void PrintData(TreeMap<Double, LinkedList<Order>> map) {
 		if (map.firstEntry().getValue().getFirst().isSide()) {
 			System.out.println("BID");
 		}

@@ -73,8 +73,8 @@ public class Main implements Runnable {
 							System.out.println("Please load test data or add a sell order.");
 						}
 						else {
-							operations.PrintMap(bid);
-							operations.PrintMap(ask);
+							operations.PrintData(bid);
+							operations.PrintData(ask);
 						}
 						Thread.sleep(1000);
 						break;
@@ -122,7 +122,7 @@ public class Main implements Runnable {
 						side = in.nextBoolean();
 						System.out.println("Enter the price to search: ");
 						price = in.nextDouble();
-						operations.PrintList(operations.Search(bid, ask, side, price));
+						operations.PrintData(operations.Search(bid, ask, side, price));
 						Thread.sleep(1000);
 						break;
 					case 8:
