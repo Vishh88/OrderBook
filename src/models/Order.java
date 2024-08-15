@@ -1,16 +1,14 @@
 package models;
 
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.UUID;
 
 public class Order {
-	private static AtomicLong counter = new AtomicLong(0);
-	private long Id = counter.incrementAndGet();
+	private String Id = UUID.randomUUID().toString();
 	private double Price;
 	private int Quantity;
 	private boolean Side;
 	
 	public Order(double price, int quantity, boolean side) {
-		super();
 		Price = price;
 		Quantity = quantity;
 		Side = side;
@@ -20,7 +18,7 @@ public class Order {
 		
 	}
 
-	public long getId() {
+	public String getId() {
 		return Id;
 	}
 		
@@ -50,7 +48,7 @@ public class Order {
 
 	@Override
 	public String toString() {
-		return "\nOrderId: " + Id + ", Price= " + Price + ", Quantity= " + Quantity + ", Side= " + Side;
+		return "OrderId: " + Id + ", Price= " + Price + ", Quantity= " + Quantity + ", Side= " + Side;
 	}
 	
 	

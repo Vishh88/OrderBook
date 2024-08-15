@@ -28,5 +28,13 @@ public class OrderGenerator {
 		newOrder.setSide(side);		
 		return newOrder;
 	}
+	
+	public Order GenerateSameSideOrder(boolean side) {
+		Order newOrder = new Order();
+		newOrder.setPrice(Double.parseDouble(df.format(random.nextDouble()*100)));
+		newOrder.setQuantity(random.nextInt(100));
+		newOrder.setSide(side);		
+		return newOrder;
+	}	
 
 }

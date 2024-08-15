@@ -1,5 +1,6 @@
 package startup;
 
+import java.util.InputMismatchException;
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.TreeMap;
@@ -7,127 +8,150 @@ import logic.Operations;
 import models.Menu;
 import models.Order;
 
-public class Main implements Runnable{
+public class Main implements Runnable {
 
 	private Operations operations = new Operations();
+
 	public static void main(String[] args) {
 		Main obj = new Main();
 		Thread thread = new Thread(obj);
 		thread.start();
 	}
-	
+
 	@Override
 	public void run() {
 		try (Scanner in = new Scanner(System.in)) {
 			TreeMap<Double, LinkedList<Order>> bid = new TreeMap<Double, LinkedList<Order>>();
 			TreeMap<Double, LinkedList<Order>> ask = new TreeMap<Double, LinkedList<Order>>();
+			String orderId = "";
+			int quantity, bidCount, askCount = 0;
+			boolean side = false;
+			double price = 0;
 			Menu menu = new Menu();
 			menu.setTitle("Simulation Menu");
 			menu.setInstructions("Please choose from the menu below \nEnter the content number and hit enter: ");
-			menu.setUnderlying("********************************************************************************************");
-			String[] content = new String[7];
-			content[0] = "End Simulation";
-			content[1] = "Add Order";
-			content[2] = "Modify Order";
-			content[3] = "Delete Order";
-			content[4] = "Modify Order";
-			content[5] = "Search Price";
-			content[6] = "";
+			menu.setUnderlying(
+					"********************************************************************************************");
+			String[] content = new String[10];
+			content[0] = "Exit Application!";
+			content[1] = "Load Test Data";
+			content[2] = "Display All Orders";
+			content[3] = "Add Order";
+			content[4] = "Generate Orders (bulk)";
+			content[5] = "Modify Order";
+			content[6] = "Delete Order";
+			content[7] = "Search Price Level";
+			content[8] = "BID Price - Quantity";
+			content[9] = "ASK Price - Quantity";
 			menu.setMenuItems(content);
-			
-			
+
 			int choice = 0;
-			while (choice != 4) {
-				System.out.println();
-				System.out.println(menu.getTitle());
-				System.out.println(menu.getInstructions());
-				System.out.println(menu.getUnderlying());
-				for(int i = 0; i < menu.getMenuItems().length; i++) {
-					System.out.println(i + " - " + menu.getMenuItems()[i]);
-				}
-				System.out.println(menu.getUnderlying());
-				
-				/*
-				 * System.out.println(); System.out.println("Simulation Menu");
-				 * System.out.println("Please choose from the menu below and hit enter: ");
-				 * System.out.println(
-				 * "********************************************************************************************"
-				 * ); System.out.println("1 - Add order");
-				 * System.out.println("2 - Load test data");
-				 * System.out.println("3 - Modify order"); System.out.println("4 - Search");
-				 * System.out.println("5 - View BID orders");
-				 * System.out.println("6 - View ASK orders");
-				 * System.out.println("0 - End Simulation"); System.out.println(
-				 * "********************************************************************************************"
-				 * );
-				 */
+			do {
+				try {
+					System.out.println();
+					System.out.println(menu.getTitle());
+					System.out.println(menu.getInstructions());
+					System.out.println(menu.getUnderlying());
+					for (int i = 0; i < menu.getMenuItems().length; i++) {
+						System.out.println(i + " - " + menu.getMenuItems()[i]);
+					}
+					System.out.println(menu.getUnderlying());
 
-				choice = in.nextInt();
+					choice = in.nextInt();
 
-				switch (choice) {
-				case 1:
-					Order newOrder = new Order();
-					System.out.println("Enter order price: ");
-					newOrder.setPrice(in.nextDouble());
-					System.out.println("Enter order quantity: ");
-					newOrder.setQuantity(in.nextInt());
-					System.out.println("Is this a buy order?");
-					System.out.println("Enter True or False");
-					newOrder.setSide(in.nextBoolean());
-					System.out.println("Storing " + newOrder);
-					operations.AddOrder(bid, ask, newOrder);
-					break;
-				case 2:
-					operations.LoadTestData(bid, ask);
-					RunTest(bid, ask);
-					break;
-				case 3:
-					operations.ModifyOrder(bid, ask, 23, 100);
-					break;
-				case 4:
-					operations.PrintList(operations.Search(bid, ask, "buy", 3.0));
-					break;
-				case 5:
-					operations.PrintPrice(bid);
-					break;
-				case 6:
-					operations.PrintPrice(ask);
-					break;
-				case 0:
-					System.out.println("Simulation is ending...");
-					System.out.println("Simulation has ended.  GoodBye.");
-					System.exit(0);
-					break;
-				default:
-					break;
+					switch (choice) {
+					case 1:
+						operations.LoadTestData(bid, ask);
+						System.out.println("Test data loaded successfully.");
+						Thread.sleep(1000);
+						break;
+					case 2:
+						if (bid.isEmpty()) {
+							System.out.println("Please load test data or add a buy order.");
+						}			
+						else if (ask.isEmpty()) {
+							System.out.println("Please load test data or add a sell order.");
+						}
+						else {
+							operations.PrintMap(bid);
+							operations.PrintMap(ask);
+						}
+						Thread.sleep(1000);
+						break;
+					case 3:
+						Order newOrder = new Order();
+						System.out.println("Enter order price: ");
+						newOrder.setPrice(in.nextDouble());
+						System.out.println("Enter order quantity: ");
+						newOrder.setQuantity(in.nextInt());
+						System.out.println("Is this a buy order?");
+						System.out.println("Enter True or False");
+						newOrder.setSide(in.nextBoolean());
+						operations.AddOrder(bid, ask, newOrder);
+						System.out.println("Order " + newOrder + " added successfully.");
+						Thread.sleep(1000);
+						break;
+					case 4:
+						System.out.println("Please enter how many buy orders you would like to generate:");
+						bidCount = in.nextInt();
+						System.out.println("Please enter how many sell orders you would like to generate:");
+						askCount = in.nextInt();
+						operations.GenerateOrders(bid, ask, bidCount, askCount);
+						System.out.println("Bulk orders generated successfully");
+						Thread.sleep(1000);
+						break;
+					case 5:
+						System.out.println("Enter the order Id: ");
+						orderId = in.next();
+						System.out.println("Enter the new quantity for this order: ");
+						quantity = in.nextInt();
+						operations.ModifyOrder(bid, ask, orderId, quantity);
+						System.out.println("Order " + orderId + " updated successfully");
+						Thread.sleep(1000);
+						break;
+					case 6:
+						System.out.println("Enter the order Id: ");
+						orderId = in.next();
+						operations.DeleteOrder(bid, ask, orderId);
+						System.out.println("Order " + orderId + " was successfully deleted.");
+						Thread.sleep(1000);
+						break;
+					case 7:
+						System.out.println("Is this a buy order?");
+						System.out.println("Enter True or False");
+						side = in.nextBoolean();
+						System.out.println("Enter the price to search: ");
+						price = in.nextDouble();
+						operations.PrintList(operations.Search(bid, ask, side, price));
+						Thread.sleep(1000);
+						break;
+					case 8:
+						operations.PrintPrice(bid);
+						Thread.sleep(1000);
+						break;
+					case 9:
+						operations.PrintPrice(ask);
+						Thread.sleep(1000);
+						break;
+					case 0:
+						System.out.println("Application is closing...");
+						System.out.println("GoodBye.");
+						System.exit(0);
+						break;
+					default:
+						System.out.println("The choice you have made is not part of the list. ");
+						System.out.println("Please select a content number from the list provided. ");
+						Thread.sleep(1000);
+						break;
+					}
+				} catch (InputMismatchException e) {
+					System.out.println("The input you have entered is invalid.  \nPlease restart the application and try again.");
+
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
-			}
+			} while (choice != 0);
+
 		}
-		
-	}
-	
-	public void RunTest(TreeMap<Double, LinkedList<Order>> bidMap, TreeMap<Double, LinkedList<Order>> askMap) {
-		//LinkedList<Order> searchResult = new LinkedList<>();
-		
-		operations.LoadTestData(bidMap, askMap);
-
-		System.out.println("\nbid list: \n" + bidMap);
-		System.out.println("\nask list: \n" + askMap);
-		operations.PrintPrice(bidMap);
-		operations.PrintPrice(askMap);
-
-		System.out.println("Deleting bid");
-		// Operations.DeleteModifyOrder(bid,ask,orderTestbid5.getId(),true,0);
-		// Operations.DeleteModifyOrder(bid,ask,orderTestbid4.getId(),true,0);
-
-		operations.PrintPrice(bidMap);
-		operations.PrintPrice(askMap);
-
-		// Operations.DeleteModifyOrder(bid,ask,orderTestask3.getId(),false,99);
-
-		operations.PrintPrice(askMap);
-
-		//searchResult = Operations.Search(bidMap, askMap, "buy", 13.45);
-		//Operations.PrintList(searchResult);
 	}
 }
