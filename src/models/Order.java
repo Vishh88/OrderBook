@@ -1,9 +1,10 @@
 package models;
 
-import generators.UIDGenerator;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class Order {
-	private String Id = UIDGenerator.nextUID();
+	private static AtomicLong counter = new AtomicLong(0);
+	private long Id = counter.incrementAndGet();
 	private double Price;
 	private int Quantity;
 	private boolean Side;
@@ -19,7 +20,7 @@ public class Order {
 		
 	}
 
-	public String getId() {
+	public long getId() {
 		return Id;
 	}
 		
@@ -49,7 +50,7 @@ public class Order {
 
 	@Override
 	public String toString() {
-		return "Order [Id=" + Id + ", Price=" + Price + ", Quantity=" + Quantity + ", Side=" + Side + "]";
+		return "\nOrderId: " + Id + ", Price= " + Price + ", Quantity= " + Quantity + ", Side= " + Side;
 	}
 	
 	

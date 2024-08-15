@@ -1,98 +1,145 @@
 package logic;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.TreeMap;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import generators.OrderGenerator;
 import models.Order;
 
 public class Operations {
 
-	public static void AddOrder(HashMap<Double, LinkedList<Order>> BIDMap, HashMap<Double, LinkedList<Order>> ASKMap, Order order) {
+	private final ReadWriteLock lock = new ReentrantReadWriteLock();
+	
+	public void AddOrder(TreeMap<Double, LinkedList<Order>> bidMap, TreeMap<Double, LinkedList<Order>> askMap, Order order) {
 		Double doubleObj = new Double(order.getPrice());
 		LinkedList<Order> orderLinkedList = new LinkedList<>();
-		
-		if (order.isSide()) {
-			
-			if (!BIDMap.containsKey(doubleObj)) {
-				orderLinkedList.add(order);
-				BIDMap.put(doubleObj, orderLinkedList);
+		lock.writeLock().lock();
+		try {
+			if (order.isSide()) {
+				if (!bidMap.containsKey(doubleObj)) {
+					orderLinkedList.add(order);
+					bidMap.put(doubleObj, orderLinkedList);
+				} else {
+					
+					bidMap.get(doubleObj).add(order);
+				}
+			} else {
+				if (!askMap.containsKey(doubleObj)) {
+					orderLinkedList.add(order);
+					askMap.put(doubleObj, orderLinkedList);
+				} else {
+					askMap.get(doubleObj).add(order);
+				}
 			}
-			else {
-				System.out.println("TestingBID" + BIDMap.get(doubleObj));
-				BIDMap.get(doubleObj).add(order);
-				System.out.println("TestingBID2" + BIDMap.get(doubleObj));
-			}
-		}
-		else {
-			if (!ASKMap.containsKey(doubleObj)) {
-				orderLinkedList.add(order);
-				ASKMap.put(doubleObj, orderLinkedList);
-			}
-			else {
-				System.out.println("TestingASK" + ASKMap.get(doubleObj));
-				ASKMap.get(doubleObj).add(order);
-				System.out.println("TestingASK2" + ASKMap.get(doubleObj));
-			}
+		} finally {
+			lock.writeLock().unlock();
 		}
 	}
 	
 	
-	public static void DeleteModifyOrder(HashMap<Double, LinkedList<Order>> BIDMap, HashMap<Double, LinkedList<Order>> ASKMap, String orderId, boolean delete, int quantity) {
-		int changed = 0;
+	public void DeleteOrder(TreeMap<Double, LinkedList<Order>> bidMap,
+			TreeMap<Double, LinkedList<Order>> askMap, long orderId, boolean delete, int quantity) {
+		
+	}
+
+	public void ModifyOrder(TreeMap<Double, LinkedList<Order>> bidMap, TreeMap<Double, LinkedList<Order>> askMap, long orderId, int newQuantity) {
 		double modifiedKey = 0;
 		Order tempOrder = new Order();
-		
-		for (Map.Entry<Double, LinkedList<Order>> entry : BIDMap.entrySet()) {
-			for (Order order: entry.getValue()) {
-				if(order.getId().equalsIgnoreCase(orderId)) {
-					if (!delete) {
+		lock.writeLock().lock();
+		try {
+			for (Map.Entry<Double, LinkedList<Order>> entry : bidMap.entrySet()) {
+				for (Order order : entry.getValue()) {
+					if (order.getId() == orderId) {
 						tempOrder = order;
-						tempOrder.setQuantity(quantity);
+						tempOrder.setQuantity(newQuantity);
 						modifiedKey = entry.getKey();
-					}
-					entry.getValue().remove(order);
-					changed =1;
-				}
-			}
-		}
-		
-		if (modifiedKey != 0)
-			BIDMap.get(modifiedKey).add(tempOrder);
-				
-		if(changed ==0){
-			for (Map.Entry<Double, LinkedList<Order>> entry : ASKMap.entrySet()) {
-				for (Order order: entry.getValue()) {
-					if(order.getId().equalsIgnoreCase(orderId)) {
-						if (!delete) {
-							tempOrder = order;
-							tempOrder.setQuantity(quantity);
-							modifiedKey = entry.getKey();
-						}
 						entry.getValue().remove(order);
-						changed =1;
 					}
 				}
 			}
-			if (modifiedKey != 0)
-				ASKMap.get(modifiedKey).add(tempOrder);
+			if (modifiedKey != 0) {
+				bidMap.get(modifiedKey).addLast(tempOrder);
+			}
+			bidMap.values().remove(new LinkedList<>());
+
+			if (modifiedKey != 0) {
+				for (Map.Entry<Double, LinkedList<Order>> entry : askMap.entrySet()) {
+					for (Order order : entry.getValue()) {
+						if (order.getId() == orderId) {
+							tempOrder = order;
+							tempOrder.setQuantity(newQuantity);
+							modifiedKey = entry.getKey();
+							entry.getValue().remove(order);
+						}
+					}
+				}
+				if (modifiedKey != 0) {
+					askMap.get(modifiedKey).add(tempOrder);
+				}
+				askMap.values().remove(new LinkedList<>());
+			}
+		} finally {
+			lock.writeLock().unlock();
 		}
 	}
-	
-	
-	public static void PrintTable(HashMap<Double, LinkedList<Order>> map) {
-		System.out.println("Table Format: ");
+
+	public void PrintPrice(TreeMap<Double, LinkedList<Order>> map) {
+		
 		for (Map.Entry<Double, LinkedList<Order>> entry : map.entrySet()) {
 			System.out.print(entry.getKey() + ": ");
-			for (Order order: entry.getValue()) {
+			for (Order order : entry.getValue()) {
 				System.out.print(order.getQuantity() + " ");
 			}
 			System.out.println();
 		}
 		System.out.println();
 	}
+
+	public LinkedList<Order> Search(TreeMap<Double, LinkedList<Order>> bidMap,
+			TreeMap<Double, LinkedList<Order>> askMap, String side, double price) {
+
+		if (side.equalsIgnoreCase("Buy")) {
+			return bidMap.get(price);
+		} else if (side.equalsIgnoreCase("Sell")) {
+			return askMap.get(price);
+		} else {
+			return new LinkedList<>();
+		}
+
+	}
+
+	public void PrintList(LinkedList<Order> list) {
+		if (list.isEmpty()) {
+			System.out.println("List is empty, nothing to print.");
+		} else {
+			System.out.println("Printing Searched orders for price: " + list.get(0).getPrice());
+			System.out.println("in priority order. ");
+			for (Order order : list) {
+				System.out.println();
+				System.out.println(order);
+			}
+		}
+	}
 	
-	public static void Search() {
+	public void PrintMap() {
 		
+	}
+
+	public void LoadTestData(TreeMap<Double, LinkedList<Order>> bidMap,
+			TreeMap<Double, LinkedList<Order>> askMap) {
+		OrderGenerator orderGenerator = new OrderGenerator();
+		System.out.println("Generating Orders...");
+		for (int i = 0; i < 10; i++) {
+			AddOrder(bidMap, askMap, orderGenerator.GenerateRandomOrder());
+		}
+
+		for (int i = 0; i < 5; i++) {
+			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, true));
+			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, false));
+			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, true));
+		}
 	}
 }
