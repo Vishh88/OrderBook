@@ -98,7 +98,7 @@ public class Operations {
 			if (orderId.startsWith("ASK")) {
 				for (Map.Entry<Double, LinkedList<Order>> entry : askMap.entrySet()) {
 					for (Order order : entry.getValue()) {
-						if (order.getId() == orderId) {
+						if (order.getId().equalsIgnoreCase(orderId)) {
 							tempOrder = order;
 							tempOrder.setQuantity(newQuantity);
 							modifiedKey = entry.getKey();
@@ -187,8 +187,6 @@ public class Operations {
 		for (int i = 0; i < 5; i++) {
 			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, true));
 			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, true));
-			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, true));
-			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, false));
 			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, false));
 			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, false));
 			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, false));
