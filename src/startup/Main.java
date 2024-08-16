@@ -11,6 +11,8 @@ import models.Order;
 public class Main implements Runnable {
 
 	private Operations operations = new Operations();
+	private TreeMap<Double, LinkedList<Order>> bid = new TreeMap<Double, LinkedList<Order>>();
+	private TreeMap<Double, LinkedList<Order>> ask = new TreeMap<Double, LinkedList<Order>>();
 
 	public static void main(String[] args) {
 		Main obj = new Main();
@@ -21,12 +23,11 @@ public class Main implements Runnable {
 	@Override
 	public void run() {
 		try (Scanner in = new Scanner(System.in)) {
-			TreeMap<Double, LinkedList<Order>> bid = new TreeMap<Double, LinkedList<Order>>();
-			TreeMap<Double, LinkedList<Order>> ask = new TreeMap<Double, LinkedList<Order>>();
 			String orderId = "";
 			int quantity, bidCount, askCount = 0;
 			boolean side = false;
 			double price = 0;
+			boolean success = false;
 			Menu menu = new Menu();
 			menu.setTitle("Simulation Menu");
 			menu.setInstructions("Please choose from the menu below \nEnter the content number and hit enter: ");
@@ -105,15 +106,25 @@ public class Main implements Runnable {
 						orderId = in.next();
 						System.out.println("Enter the new quantity for this order: ");
 						quantity = in.nextInt();
-						operations.ModifyOrder(bid, ask, orderId, quantity);
-						System.out.println("Order " + orderId + " updated successfully");
+						success = operations.ModifyOrder(bid, ask, orderId, quantity);
+						if (success) {
+							System.out.println("Order " + orderId + " was successfully updated.");
+						}
+						else {
+							System.out.println("Order " + orderId + " was not found.  \nPlease check the orderId and try again.");
+						}
 						Thread.sleep(1000);
 						break;
 					case 6:
 						System.out.println("Enter the order Id: ");
 						orderId = in.next();
-						operations.DeleteOrder(bid, ask, orderId);
-						System.out.println("Order " + orderId + " was successfully deleted.");
+						success = operations.DeleteOrder(bid, ask, orderId);
+						if (success) {
+							System.out.println("Order " + orderId + " was successfully deleted.");
+						}
+						else {
+							System.out.println("Order " + orderId + " was not found.  \nPlease check the orderId and try again.");
+						}
 						Thread.sleep(1000);
 						break;
 					case 7:

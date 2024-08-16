@@ -23,7 +23,6 @@ public class Operations {
 					orderLinkedList.add(order);
 					bidMap.put(doubleObj, orderLinkedList);
 				} else {
-					
 					bidMap.get(doubleObj).add(order);
 				}
 			} else {
@@ -40,7 +39,7 @@ public class Operations {
 	}
 	
 	
-	public void DeleteOrder(TreeMap<Double, LinkedList<Order>> bidMap, TreeMap<Double, LinkedList<Order>> askMap, String orderId) {
+	public boolean DeleteOrder(TreeMap<Double, LinkedList<Order>> bidMap, TreeMap<Double, LinkedList<Order>> askMap, String orderId) {
 		boolean deleted = false;
 		lock.writeLock().lock();
 		try {
@@ -51,7 +50,7 @@ public class Operations {
 						deleted = true;
 					}
 				}
-			}
+			}// removes all objects from the map with empty values
 			bidMap.values().remove(new LinkedList<>());
 
 			if (!deleted) {
@@ -59,18 +58,20 @@ public class Operations {
 					for (Order order : entry.getValue()) {
 						if (order.getId().equalsIgnoreCase(orderId)) {
 							entry.getValue().remove(order);
+							deleted = true;
 						}
 					}
-				}
+				}// removes all objects from the map with empty values
 				askMap.values().remove(new LinkedList<>());
 			}
 		} finally {
 			lock.writeLock().unlock();
 		}
+		return deleted;
 		
 	}
 
-	public void ModifyOrder(TreeMap<Double, LinkedList<Order>> bidMap, TreeMap<Double, LinkedList<Order>> askMap, String orderId, int newQuantity) {
+	public boolean ModifyOrder(TreeMap<Double, LinkedList<Order>> bidMap, TreeMap<Double, LinkedList<Order>> askMap, String orderId, int newQuantity) {
 		double modifiedKey = 0;
 		Order tempOrder = new Order();
 		lock.writeLock().lock();
@@ -87,7 +88,7 @@ public class Operations {
 			}
 			if (modifiedKey != 0) {
 				bidMap.get(modifiedKey).addLast(tempOrder);
-			}
+			}// removes all objects from the map with empty values
 			bidMap.values().remove(new LinkedList<>());
 
 			if (modifiedKey != 0) {
@@ -103,11 +104,17 @@ public class Operations {
 				}
 				if (modifiedKey != 0) {
 					askMap.get(modifiedKey).add(tempOrder);
-				}
+				}// removes all objects from the map with empty values
 				askMap.values().remove(new LinkedList<>());
 			}
 		} finally {
 			lock.writeLock().unlock();
+		}// checking if any order was modified, then send a successful response back, else failure response back
+		if (modifiedKey == 0) {
+			return false;
+		}
+		else {
+			return true; 
 		}
 	}
 
@@ -179,6 +186,8 @@ public class Operations {
 			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, false));
 			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, true));
 		}
+		askMap.values().remove(new LinkedList<>());
+		bidMap.values().remove(new LinkedList<>());
 	}
 
 

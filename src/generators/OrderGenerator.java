@@ -15,8 +15,8 @@ public class OrderGenerator {
 	
 	public Order GenerateRandomOrder() {
 		Order newOrder = new Order();
-		newOrder.setPrice(Double.parseDouble(df.format(random.nextDouble()*100)));
-		newOrder.setQuantity(random.nextInt(100));
+		newOrder.setPrice(Double.parseDouble(df.format(random.nextDouble()*100))); // generates price from 0 to 100. 
+		newOrder.setQuantity(random.nextInt(100)+1); // generates random integer between 1 and 100 preventing quantity from being 0, limiting quantity for the purpose of this assignment to 100. 
 		newOrder.setSide(random.nextBoolean());
 		return newOrder;
 	}
@@ -24,15 +24,15 @@ public class OrderGenerator {
 	public Order GenerateSamePriceOrder(double price, boolean side) {
 		Order newOrder = new Order();
 		newOrder.setPrice(price);
-		newOrder.setQuantity(random.nextInt(100));
+		newOrder.setQuantity(random.nextInt(100)+1); // generates random integer between 1 and 100 preventing quantity from being 0, limiting quantity for the purpose of this assignment to 100. 
 		newOrder.setSide(side);		
 		return newOrder;
 	}
 	
 	public Order GenerateSameSideOrder(boolean side) {
 		Order newOrder = new Order();
-		newOrder.setPrice(Double.parseDouble(df.format(random.nextDouble()*100)));
-		newOrder.setQuantity(random.nextInt(100));
+		newOrder.setPrice(Double.parseDouble(df.format(random.nextDouble()*100))); // generates price from 0 to 100. 
+		newOrder.setQuantity(random.nextInt(100)+1); // generates random integer between 1 and 100 preventing quantity from being 0, limiting quantity for the purpose of this assignment to 100. 
 		newOrder.setSide(side);		
 		return newOrder;
 	}	
