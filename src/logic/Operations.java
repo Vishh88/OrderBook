@@ -186,6 +186,10 @@ public class Operations {
 
 		for (int i = 0; i < 5; i++) {
 			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, true));
+			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, true));
+			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, true));
+			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, false));
+			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, false));
 			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, false));
 			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, false));
 			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, true));
