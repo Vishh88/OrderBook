@@ -21,6 +21,9 @@ This will keep the order book running smoothly without tasks waiting for each ot
 Single Responsibility Principle was used to avoid creating long methods to accomplish multiple tasks, long methods can lead to performance bottlenecks.
 Each method has a single responsibility and focus on a specific functionality.  
 
+I added prefix's to the orderId, 'BID' for bid orders and 'ASK' for ask orders.  These prefix's will save us on computational process when searching for the order by orderId for Delete and modified. 
+Instead of looping through both TreeMaps (bidMap and askMap) searching for the unique orderID, depending on the prefix we will only need to loop through either bidMap or askMap.
+
 A linkedList datastructure was chosen to be used instead of an arraylist as manipulation is faster with a linkedList.  Manipulation of a linked list requires no bit shifting in memory.
 A TreeMap datastructure was chosen over a hashMap, because the TreeMap will keep all the data sorted by Key in a natural sorting manner.  sorting of the key is necessary to complete this task. 
 In Java when passing a TreeMap object as an argument, the TreeMap is passed by reference, I used this as an opportunity to pass in both BID and ASK TreeMaps as arguments when their details were 
@@ -90,7 +93,8 @@ Java has simple generation methods to generate UUID's.
 Then I saw that efficiency and performance will be evaluated, I started thinking of maybe using an int for the Unique Id of the orders.  
 I was going to implement the atomic integer method, which will increment on each order created.  But this could become complicated with 
 different threads.  Thus with threading involved the best option was to generate the UUID unique Id.  
-This will also allow for an elarge number of orders, whereas with an integer or long datatype the amount of unique Ids can be limited. 
+This will also allow for a large number of orders, whereas with an integer or long datatype the amount of unique Ids can be limited. 
+I Pre-fixed the unique Id with 'BID' or 'ASK' to improve performance when searching by orderId for delete and modify functionality. 
 
 Order.java
 I created Order.java to hold the order details. 
@@ -127,12 +131,18 @@ In Java when passing the TreeMap as an argument, the TreeMap is passed by refere
   		change the quantity to the newQuantity.  It will then remove the existing order from the linkedList it was found on.  It will push the tempOrder to the end of the LinkedList, thus resetting the
   		priority of the order to the last priority. The LinkedList is ordered with highest priority on top, as new orders are added they are added to the bottom of the list.
 - SearchPrice: This function takes in a boolean side and a double price.  If the side is true it is a bid order, if false it is an ask order.
-		The function returns the LinkedList for the key = price from either the bidMap or the askMap depending on the side variable. 
+		The function returns the LinkedList for the key = price from either the bidMap or the askMap depending on the side variable.
+- PrintData: This method has been overloaded to print the LinkedList and to print the TreeMap in tabular format. This is just to display the collected orders for the user neatly.  The user can then select the orderID
+	     	to be used ofr other functions such as delete and modify.
+- LoadTestData: This method is used to load preconfigured test data into the maps for the purpose of simulating functionality.  It generates some random orders for both bid and ask.  The method also generates specific
+		orders with the same price level so that the prioritisation can be tested and viewed when the order has been modified.
+- GenerateOrders: This method was created to provide the user with the functionality to generate orders in bulk for both Ask and Bid.  	
 
 I like my applications to run, so I created a menu and simulation of the functionality of the order book, so that one may experience the 
 functionality first hand.  
 Together with this menu, I needed a way for the user to view the orders that were created, deleted and modified.  I created a method to 
-print out the orders in tabular format to the console for the user to make use of.  
+print out the orders in tabular format to the console for the user to make use of.  This provides the user with the order details, where the user can view the orderId and use it to delete or modify orders and 
+view the results. 
 
 **********************************************************************************************************************************************************************************************************
 
