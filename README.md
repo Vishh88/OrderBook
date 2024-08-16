@@ -112,12 +112,22 @@ GenerateSamePriceOrder will generate orders for a specific side and price.
 GenerateSameSideOrder will generate orders for a specific side.  
 These are used to generate test order data for the purpose of the simulation.
 
-Operations.java class 
+Operations.java
 I created Operations.java to hold all the functionality that will be used for the order book, such as adding orders to the book, 
 deleting orders from the book, modifying existing orders.  This keeps all functionality in a neat clean class, easy to find and debug if necessary.  
 In Java when passing the TreeMap as an argument, the TreeMap is passed by reference.  
-- AddOrder: It was necessary to write lock the thread for addOrder until the addition of the new order was completed.  This prevents concurrent update errors from different threads to the same TreeMap. 
-- 
+- AddOrder: This function takes in a new order and adds it to the relevant TreeMap(either to BID or ASK).
+  	    It was necessary to write lock the thread for addOrder until the addition of the new order was completed.  This prevents concurrent update errors from different threads to the same TreeMap. 
+- DeleteOrder: This function takes in an orderId, and searches first the BidMap for the order, if found it will delete the order from the BidMap and set a local deleted flag to true.
+   		If the Delete flag is not true, the function will search the AskMap for the orderId and delete the order from the AskMap.
+  		The Delete flag is introduced to the function to prevent unecessary looping, to improve performance.
+  		The orderId is unique and can only be found in either the bidMap or the askMap, there is no need to cycle through both TreeMaps
+  		Write lock is applied to threads to prevent concurrent updates.
+- ModifyOrder: This function takes in the orderId and newQuantity amount.  The function will first search the BidMap for the order by orderID, if found, it will store the order in a tempOrder variable and
+  		change the quantity to the newQuantity.  It will then remove the existing order from the linkedList it was found on.  It will push the tempOrder to the end of the LinkedList, thus resetting the
+  		priority of the order to the last priority. The LinkedList is ordered with highest priority on top, as new orders are added they are added to the bottom of the list.
+- SearchPrice: This function takes in a boolean side and a double price.  If the side is true it is a bid order, if false it is an ask order.
+		The function returns the LinkedList for the key = price from either the bidMap or the askMap depending on the side variable. 
 
 I like my applications to run, so I created a menu and simulation of the functionality of the order book, so that one may experience the 
 functionality first hand.  
