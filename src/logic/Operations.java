@@ -16,9 +16,9 @@ public class Operations {
 	public void AddOrder(TreeMap<Double, LinkedList<Order>> bidMap, TreeMap<Double, LinkedList<Order>> askMap, Order order) {
 		Double doubleObj = new Double(order.getPrice());
 		LinkedList<Order> orderLinkedList = new LinkedList<>();
-		lock.writeLock().lock();
+		lock.writeLock().lock(); //write lock thread so that other thread won't be able to update while this thread is updating
 		try {
-			if (order.isSide()) {
+			if (order.isSide()) { //check if order is a bid order before adding it to the BID TreeMap
 				if (!bidMap.containsKey(doubleObj)) {
 					orderLinkedList.add(order);
 					bidMap.put(doubleObj, orderLinkedList);
@@ -33,7 +33,7 @@ public class Operations {
 					askMap.get(doubleObj).add(order);
 				}
 			}
-		} finally {
+		} finally { //write unlock thread so that the TreeMaps  can be updated by any thread
 			lock.writeLock().unlock();
 		}
 	}
