@@ -3,7 +3,7 @@ package models;
 import java.util.UUID;
 
 public class Order {
-	private String Id = UUID.randomUUID().toString();
+	private String Id = UUID.randomUUID().toString();;
 	private double Price;
 	private int Quantity;
 	private boolean Side;
@@ -12,6 +12,12 @@ public class Order {
 		Price = price;
 		Quantity = quantity;
 		Side = side;
+		if(side) {
+			Id = "BID-" + Id;
+		}
+		else {
+			Id = "ASK-" + Id;
+		}
 	}
 	
 	public Order() {
@@ -44,6 +50,12 @@ public class Order {
 	
 	public void setSide(boolean side) {
 		Side = side;
+		if(side) {
+			Id = "BID-" + Id;
+		}
+		else {
+			Id = "ASK-" + Id;
+		}
 	}
 
 	@Override

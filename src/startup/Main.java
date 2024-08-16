@@ -63,19 +63,20 @@ public class Main implements Runnable {
 					switch (choice) {
 					case 1:
 						operations.LoadTestData(bid, ask);
-						System.out.println("Test data loaded successfully.");
 						Thread.sleep(1000);
+						System.out.println("Test data loaded successfully.");
 						break;
 					case 2:
-						if (bid.isEmpty()) {
-							System.out.println("Please load test data or add a buy order.");
-						}			
-						else if (ask.isEmpty()) {
-							System.out.println("Please load test data or add a sell order.");
-						}
-						else {
+						if (!bid.isEmpty()) {
 							operations.PrintData(bid);
+						}			
+						
+						if (!ask.isEmpty()) {
 							operations.PrintData(ask);
+						}
+						
+						if(bid.isEmpty() && ask.isEmpty()) {
+							System.out.println("No orders have been created.  \nPlease load test data or create new orders and try again.");
 						}
 						Thread.sleep(1000);
 						break;

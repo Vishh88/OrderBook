@@ -43,17 +43,19 @@ public class Operations {
 		boolean deleted = false;
 		lock.writeLock().lock();
 		try {
-			for (Map.Entry<Double, LinkedList<Order>> entry : bidMap.entrySet()) {
-				for (Order order : entry.getValue()) {
-					if (order.getId().equalsIgnoreCase(orderId)) {
-						entry.getValue().remove(order);
-						deleted = true;
+			if (orderId.startsWith("BID")) {
+				for (Map.Entry<Double, LinkedList<Order>> entry : bidMap.entrySet()) {
+					for (Order order : entry.getValue()) {
+						if (order.getId().equalsIgnoreCase(orderId)) {
+							entry.getValue().remove(order);
+							deleted = true;
+						}
 					}
-				}
-			}// removes all objects from the map with empty values
-			bidMap.values().remove(new LinkedList<>());
+				} // removes all objects from the map with empty values
+				bidMap.values().remove(new LinkedList<>());
+			}
 
-			if (!deleted) {
+			if (orderId.startsWith("ASK")) {
 				for (Map.Entry<Double, LinkedList<Order>> entry : askMap.entrySet()) {
 					for (Order order : entry.getValue()) {
 						if (order.getId().equalsIgnoreCase(orderId)) {
@@ -76,22 +78,24 @@ public class Operations {
 		Order tempOrder = new Order();
 		lock.writeLock().lock();
 		try {
-			for (Map.Entry<Double, LinkedList<Order>> entry : bidMap.entrySet()) {
-				for (Order order : entry.getValue()) {
-					if (order.getId().equalsIgnoreCase(orderId)) {
-						tempOrder = order;
-						tempOrder.setQuantity(newQuantity);
-						modifiedKey = entry.getKey();
-						entry.getValue().remove(order);
+			if (orderId.startsWith("BID")) {
+				for (Map.Entry<Double, LinkedList<Order>> entry : bidMap.entrySet()) {
+					for (Order order : entry.getValue()) {
+						if (order.getId().equalsIgnoreCase(orderId)) {
+							tempOrder = order;
+							tempOrder.setQuantity(newQuantity);
+							modifiedKey = entry.getKey();
+							entry.getValue().remove(order);
+						}
 					}
 				}
+				if (modifiedKey != 0) {
+					bidMap.get(modifiedKey).addLast(tempOrder);
+				} // removes all objects from the map with empty values
+				bidMap.values().remove(new LinkedList<>());
 			}
-			if (modifiedKey != 0) {
-				bidMap.get(modifiedKey).addLast(tempOrder);
-			}// removes all objects from the map with empty values
-			bidMap.values().remove(new LinkedList<>());
 
-			if (modifiedKey != 0) {
+			if (orderId.startsWith("ASK")) {
 				for (Map.Entry<Double, LinkedList<Order>> entry : askMap.entrySet()) {
 					for (Order order : entry.getValue()) {
 						if (order.getId() == orderId) {
