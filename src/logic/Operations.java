@@ -46,26 +46,34 @@ public class Operations {
 		lock.writeLock().lock();
 		try {
 			if (orderId.startsWith("BID")) {
-				for (Map.Entry<Double, LinkedList<Order>> entry : bidMap.entrySet()) {
-					for (Order order : entry.getValue()) {
-						if (order.getId().equalsIgnoreCase(orderId)) {
-							entry.getValue().remove(order);
+				Iterator<Map.Entry<Double, LinkedList<Order>>> mapIterator = bidMap.entrySet().iterator();
+				while(mapIterator.hasNext()) {
+					Map.Entry<Double, LinkedList<Order>> tmpMap = mapIterator.next();
+					ListIterator<Order> llIterator = tmpMap.getValue().listIterator();
+					while(llIterator.hasNext()) {
+						Order iteratorOrder = llIterator.next(); 
+						if(iteratorOrder.getId().equalsIgnoreCase(orderId)) {
+							llIterator.remove();
 							deleted = true;
 						}
 					}
-				} // removes all objects from the map with empty values
+				}
 				bidMap.values().remove(new LinkedList<>());
 			}
 
 			if (orderId.startsWith("ASK")) {
-				for (Map.Entry<Double, LinkedList<Order>> entry : askMap.entrySet()) {
-					for (Order order : entry.getValue()) {
-						if (order.getId().equalsIgnoreCase(orderId)) {
-							entry.getValue().remove(order);
+				Iterator<Map.Entry<Double, LinkedList<Order>>> mapIterator = askMap.entrySet().iterator();
+				while(mapIterator.hasNext()) {
+					Map.Entry<Double, LinkedList<Order>> tmpMap = mapIterator.next();
+					ListIterator<Order> llIterator = tmpMap.getValue().listIterator();
+					while(llIterator.hasNext()) {
+						Order iteratorOrder = llIterator.next(); 
+						if(iteratorOrder.getId().equalsIgnoreCase(orderId)) {
+							llIterator.remove();
 							deleted = true;
 						}
 					}
-				}// removes all objects from the map with empty values
+				}
 				askMap.values().remove(new LinkedList<>());
 			}
 		} finally {
