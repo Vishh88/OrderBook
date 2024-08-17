@@ -46,26 +46,34 @@ public class Operations {
 		lock.writeLock().lock();
 		try {
 			if (orderId.startsWith("BID")) {
-				for (Map.Entry<Double, LinkedList<Order>> entry : bidMap.entrySet()) {
-					for (Order order : entry.getValue()) {
-						if (order.getId().equalsIgnoreCase(orderId)) {
-							entry.getValue().remove(order);
+				Iterator<Map.Entry<Double, LinkedList<Order>>> mapIterator = bidMap.entrySet().iterator();
+				while(mapIterator.hasNext()) {
+					Map.Entry<Double, LinkedList<Order>> tmpMap = mapIterator.next();
+					ListIterator<Order> llIterator = tmpMap.getValue().listIterator();
+					while(llIterator.hasNext()) {
+						Order iteratorOrder = llIterator.next(); 
+						if(iteratorOrder.getId().equalsIgnoreCase(orderId)) {
+							llIterator.remove();
 							deleted = true;
 						}
 					}
-				} // removes all objects from the map with empty values
+				}
 				bidMap.values().remove(new LinkedList<>());
 			}
 
 			if (orderId.startsWith("ASK")) {
-				for (Map.Entry<Double, LinkedList<Order>> entry : askMap.entrySet()) {
-					for (Order order : entry.getValue()) {
-						if (order.getId().equalsIgnoreCase(orderId)) {
-							entry.getValue().remove(order);
+				Iterator<Map.Entry<Double, LinkedList<Order>>> mapIterator = askMap.entrySet().iterator();
+				while(mapIterator.hasNext()) {
+					Map.Entry<Double, LinkedList<Order>> tmpMap = mapIterator.next();
+					ListIterator<Order> llIterator = tmpMap.getValue().listIterator();
+					while(llIterator.hasNext()) {
+						Order iteratorOrder = llIterator.next(); 
+						if(iteratorOrder.getId().equalsIgnoreCase(orderId)) {
+							llIterator.remove();
 							deleted = true;
 						}
 					}
-				}// removes all objects from the map with empty values
+				}
 				askMap.values().remove(new LinkedList<>());
 			}
 		} finally {
@@ -81,7 +89,6 @@ public class Operations {
 		lock.writeLock().lock();
 		try {
 			if (orderId.startsWith("BID")) {
-				
 				Iterator<Map.Entry<Double, LinkedList<Order>>> mapIterator = bidMap.entrySet().iterator();
 				while(mapIterator.hasNext()) {
 					Map.Entry<Double, LinkedList<Order>> tmpMap = mapIterator.next();
@@ -135,93 +142,12 @@ public class Operations {
 		}
 	}
 
-	public void PrintPrice(TreeMap<Double, LinkedList<Order>> map) {
-		System.out.format("+---------+----------------------------------------------------+%n");
-		System.out.format("| Price   | Quantity  HighestPriority -----> LowestPriority    |%n");
-		System.out.format("+---------+----------------------------------------------------+%n");
-		String leftAlignment = "| %-7.2f |";
-		for (Map.Entry<Double, LinkedList<Order>> entry : map.entrySet()) {
-			System.out.format(leftAlignment, entry.getKey());
-			for (Order order : entry.getValue()) {
-				System.out.print(order.getQuantity() + "  ");
-				
-			}
-			System.out.println();
-		}
-		System.out.println();
-	}
-
-	public LinkedList<Order> Search(TreeMap<Double, LinkedList<Order>> bidMap, TreeMap<Double, LinkedList<Order>> askMap, boolean side, double price) {
+	public LinkedList<Order> SearchPrice(TreeMap<Double, LinkedList<Order>> bidMap, TreeMap<Double, LinkedList<Order>> askMap, boolean side, double price) {
 		if (side) {
 			return bidMap.get(price);
 		} else { 
 			return askMap.get(price);
 		} 
 	}
-
-	public void PrintData(LinkedList<Order> list) {
-		if (list.isEmpty()) {
-			System.out.println("List is empty, nothing to print.");
-		} else {
-			System.out.println("Printing searched orders for price: " + list.get(0).getPrice());
-			System.out.println("in descending priority order. ");
-			for (Order order : list) {
-				System.out.println();
-				System.out.println(order);
-			}
-		}
-	}
 	
-	public void PrintData(TreeMap<Double, LinkedList<Order>> map) {
-		if (map.firstEntry().getValue().getFirst().isSide()) {
-			System.out.println("BID");
-		}
-		else {
-			System.out.println("\nASK");
-		}
-		System.out.format("+---------+----------------------------------------------------+%n");
-		System.out.format("| Price   | Orders                                             |%n");
-		System.out.format("+---------+----------------------------------------------------+%n");
-		String leftAlignment = "| %-7s | %-7.100s |%n";
-		for (Map.Entry<Double, LinkedList<Order>> entry : map.entrySet()) {
-			for (Order order : entry.getValue()) {
-				System.out.format(leftAlignment, entry.getKey().toString(), order.toString());
-			}
-		}
-	}
-
-	public void LoadTestData(TreeMap<Double, LinkedList<Order>> bidMap, TreeMap<Double, LinkedList<Order>> askMap) {
-		OrderGenerator orderGenerator = new OrderGenerator();
-		System.out.println("Generating Orders...");
-		for (int i = 0; i < 10; i++) {
-			AddOrder(bidMap, askMap, orderGenerator.GenerateRandomOrder());
-		}
-
-		for (int i = 0; i < 5; i++) {
-			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, true));
-			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, true));
-			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, false));
-			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, false));
-			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, false));
-			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, true));
-			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, true));
-			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, false));
-			AddOrder(bidMap, askMap, orderGenerator.GenerateSamePriceOrder(i + 3, false));
-		}
-		askMap.values().remove(new LinkedList<>());
-		bidMap.values().remove(new LinkedList<>());
-	}
-
-
-	public void GenerateOrders(TreeMap<Double, LinkedList<Order>> bidMap, TreeMap<Double, LinkedList<Order>> askMap, int bidCount, int askCount) {
-		OrderGenerator orderGenerator = new OrderGenerator();
-		for (int i=0; i<bidCount; i++) {
-			AddOrder(bidMap, askMap, orderGenerator.GenerateSameSideOrder(true));
-		}
-		
-		for (int i=0; i<askCount; i++) {
-			AddOrder(bidMap, askMap, orderGenerator.GenerateSameSideOrder(false));
-		}
-		
-	}
 }

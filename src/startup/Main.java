@@ -4,6 +4,10 @@ import java.util.InputMismatchException;
 import java.util.LinkedList;
 import java.util.Scanner;
 import java.util.TreeMap;
+
+import generators.TestData;
+import logic.Displays;
+import logic.MatchingEngine;
 import logic.Operations;
 import models.Menu;
 import models.Order;
@@ -11,13 +15,16 @@ import models.Order;
 public class Main implements Runnable {
 
 	private Operations operations = new Operations();
+	private Displays display = new Displays();
+	private TestData testData = new TestData();
+	private MatchingEngine matchingEngine = new MatchingEngine();
 	private TreeMap<Double, LinkedList<Order>> bid = new TreeMap<Double, LinkedList<Order>>();
 	private TreeMap<Double, LinkedList<Order>> ask = new TreeMap<Double, LinkedList<Order>>();
 
 	public static void main(String[] args) {
 		Main obj = new Main();
-		Thread thread = new Thread(obj);
-		thread.start();
+		Thread thread = new Thread(obj); 
+		thread.start(); // Creating a new instance of the order book on a different thread
 	}
 
 	@Override
@@ -33,7 +40,7 @@ public class Main implements Runnable {
 			menu.setInstructions("Please choose from the menu below \nEnter the content number and hit enter: ");
 			menu.setUnderlying(
 					"********************************************************************************************");
-			String[] content = new String[10];
+			String[] content = new String[11];
 			content[0] = "Exit Application!";
 			content[1] = "Load Test Data";
 			content[2] = "Display All Orders";
@@ -44,6 +51,7 @@ public class Main implements Runnable {
 			content[7] = "Search Price Level";
 			content[8] = "BID Price - Quantity";
 			content[9] = "ASK Price - Quantity";
+			content[10] = "Execute An Order";
 			menu.setMenuItems(content);
 
 			int choice = 0;
@@ -62,17 +70,17 @@ public class Main implements Runnable {
 
 					switch (choice) {
 					case 1:
-						operations.LoadTestData(bid, ask);
+						testData.LoadTestData(bid, ask);
 						Thread.sleep(1000);
 						System.out.println("Test data loaded successfully.");
 						break;
 					case 2:
 						if (!bid.isEmpty()) {
-							operations.PrintData(bid);
+							display.PrintData(bid);
 						}			
 						
 						if (!ask.isEmpty()) {
-							operations.PrintData(ask);
+							display.PrintData(ask);
 						}
 						
 						if(bid.isEmpty() && ask.isEmpty()) {
@@ -80,7 +88,7 @@ public class Main implements Runnable {
 						}
 						Thread.sleep(1000);
 						break;
-					case 3:
+					case 3: //Add order
 						Order newOrder = new Order();
 						System.out.println("Enter order price: ");
 						newOrder.setPrice(in.nextDouble());
@@ -98,7 +106,7 @@ public class Main implements Runnable {
 						bidCount = in.nextInt();
 						System.out.println("Please enter how many sell orders you would like to generate:");
 						askCount = in.nextInt();
-						operations.GenerateOrders(bid, ask, bidCount, askCount);
+						testData.GenerateOrders(bid, ask, bidCount, askCount);
 						System.out.println("Bulk orders generated successfully");
 						Thread.sleep(1000);
 						break;
@@ -134,15 +142,29 @@ public class Main implements Runnable {
 						side = in.nextBoolean();
 						System.out.println("Enter the price to search: ");
 						price = in.nextDouble();
-						operations.PrintData(operations.Search(bid, ask, side, price));
+						display.PrintData(operations.SearchPrice(bid, ask, side, price));
 						Thread.sleep(1000);
 						break;
 					case 8:
-						operations.PrintPrice(bid);
+						display.PrintPrice(bid);
 						Thread.sleep(1000);
 						break;
 					case 9:
-						operations.PrintPrice(ask);
+						display.PrintPrice(ask);
+						Thread.sleep(1000);
+						break;
+					case 10:
+						Order executeOrder = new Order();
+						System.out.println("Enter order price: ");
+						executeOrder.setPrice(in.nextDouble());
+						System.out.println("Enter order quantity: ");
+						executeOrder.setQuantity(in.nextInt());
+						System.out.println("Is this a buy order?");
+						System.out.println("Enter True or False");
+						executeOrder.setSide(in.nextBoolean());
+						operations.AddOrder(bid, ask, executeOrder);
+						System.out.println("Order " + executeOrder + " added successfully.");
+						matchingEngine.ExecuteOrder(bid, ask, executeOrder);
 						Thread.sleep(1000);
 						break;
 					case 0:
