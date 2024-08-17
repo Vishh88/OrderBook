@@ -56,7 +56,7 @@ public class MatchingEngine {
 		}
 		else {
 			newQuantity = newQuantity*(-1);
-			operation.ModifyOrder(bidMap, askMap, tmpOrder.getId(), newQuantity);
+			operation.UpdateOrder(bidMap, askMap, tmpOrder.getId(), newQuantity);
 			return true;
 		}
 		
