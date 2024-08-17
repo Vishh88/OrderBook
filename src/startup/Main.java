@@ -115,8 +115,7 @@ public class Main implements Runnable {
 						orderId = in.next();
 						System.out.println("Enter the new quantity for this order: ");
 						quantity = in.nextInt();
-						success = operations.ModifyOrder(bid, ask, orderId, quantity);
-						if (success) {
+						if (operations.ModifyOrder(bid, ask, orderId, quantity)) {
 							System.out.println("Order " + orderId + " was successfully updated.");
 						}
 						else {
@@ -127,8 +126,7 @@ public class Main implements Runnable {
 					case 6:
 						System.out.println("Enter the order Id: ");
 						orderId = in.next();
-						success = operations.DeleteOrder(bid, ask, orderId);
-						if (success) {
+						if (operations.DeleteOrder(bid, ask, orderId)) {
 							System.out.println("Order " + orderId + " was successfully deleted.");
 						}
 						else {
@@ -162,9 +160,12 @@ public class Main implements Runnable {
 						System.out.println("Is this a buy order?");
 						System.out.println("Enter True or False");
 						executeOrder.setSide(in.nextBoolean());
-						operations.AddOrder(bid, ask, executeOrder);
-						System.out.println("Order " + executeOrder + " added successfully.");
-						matchingEngine.ExecuteOrder(bid, ask, executeOrder);
+						if(matchingEngine.ExecuteOrder(bid, ask, executeOrder)) {
+							System.out.println("Execution of order " +executeOrder + " \nwas successfully.");
+						}
+						else {
+							System.out.println("Error Executing order, please try again.");
+						}							
 						Thread.sleep(1000);
 						break;
 					case 0:
