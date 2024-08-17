@@ -16,25 +16,18 @@ public class MatchingEngine {
 	}
 	
 	public boolean ExecuteOrder(TreeMap<Double, LinkedList<Order>> bidMap, TreeMap<Double, LinkedList<Order>> askMap, Order order) {
-		Double doubleObj = new Double(order.getPrice());
+		Order tmpOrder = new Order();
 		lock.writeLock().lock(); //write lock thread so that other thread won't be able to update while this thread is updating
 		try {
-			if (!order.isSide()) { //If it is a sell limit order we subtract from the bid side
-				if (!bidMap.containsKey(doubleObj)) {
-					while(order.getPrice() > bidMap.firstKey()) {
-						return DeleteCreateLogic(bidMap, askMap, order);
-					}
-
-				} else {
-					return DeleteCreateLogic(bidMap, askMap, order);
+			if (!order.isSide()) { // If it is a sell limit order we subtract from the bid side
+				while (order.getPrice() > bidMap.firstKey()) {
+					tmpOrder = bidMap.firstEntry().getValue().element();
+					return DeleteCreateLogic(bidMap, askMap, tmpOrder, order);
 				}
-			} else { //If it is a buy limit order we subtract from the ask side
-				if (!askMap.containsKey(doubleObj)) {
-					while(order.getPrice() > askMap.firstKey()) {
-						return DeleteCreateLogic(bidMap, askMap, order);
-					}
-				} else {
-					return DeleteCreateLogic(bidMap, askMap, order);
+			} else { // If it is a buy limit order we subtract from the ask side
+				while (order.getPrice() > askMap.firstKey()) {
+					tmpOrder = askMap.firstEntry().getValue().element();
+					return DeleteCreateLogic(bidMap, askMap, tmpOrder, order);
 				}
 			}
 		} finally { //write unlock thread so that the TreeMaps  can be updated by any thread
@@ -43,15 +36,14 @@ public class MatchingEngine {
 		return false;
 	}
 	
-	private boolean DeleteCreateLogic(TreeMap<Double, LinkedList<Order>> bidMap, TreeMap<Double, LinkedList<Order>> askMap, Order order) {
-		Order tmpOrder = bidMap.firstEntry().getValue().element();
+	private boolean DeleteCreateLogic(TreeMap<Double, LinkedList<Order>> bidMap, TreeMap<Double, LinkedList<Order>> askMap, Order tmpOrder, Order order) {
 		int newQuantity = order.getQuantity() - tmpOrder.getQuantity();
 		if(newQuantity > 0) {
 			operation.DeleteOrder(bidMap, askMap, tmpOrder.getId());
 			Order newOrder = new Order();
 			newOrder.setPrice(order.getPrice());
 			newOrder.setQuantity(newQuantity);
-			newOrder.setSide(false);
+			newOrder.setSide(order.isSide());
 			return ExecuteOrder(bidMap, askMap, newOrder); //recursion
 		}
 		else {
