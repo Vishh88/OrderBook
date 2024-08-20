@@ -34,7 +34,6 @@ public class Main implements Runnable {
 			int quantity, bidCount, askCount = 0;
 			boolean side = false;
 			double price = 0;
-			boolean success = false;
 			Menu menu = new Menu();
 			menu.setTitle("Simulation Menu");
 			menu.setInstructions("Please choose from the menu below \nEnter the content number and hit enter: ");
@@ -153,7 +152,7 @@ public class Main implements Runnable {
 						break;
 					case 10:
 						Order executeOrder = new Order();
-						System.out.println("Enter order price: ");
+						System.out.println("Enter the limit order price: ");
 						executeOrder.setPrice(in.nextDouble());
 						System.out.println("Enter order quantity: ");
 						executeOrder.setQuantity(in.nextInt());
@@ -181,6 +180,7 @@ public class Main implements Runnable {
 					}
 				} catch (InputMismatchException e) {
 					System.out.println("The input you have entered is invalid.  \nPlease restart the application and try again.");
+					System.exit(0);
 
 				} catch (InterruptedException e) {
 					e.printStackTrace();
