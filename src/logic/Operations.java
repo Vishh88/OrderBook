@@ -140,43 +140,6 @@ public class Operations {
 			return true; 
 		}
 	}
-	//Created Update order to update the quantity of the order after execution of orders
-	public void UpdateOrder(TreeMap<Double, LinkedList<Order>> bidMap, TreeMap<Double, LinkedList<Order>> askMap, String orderId, int newQuantity) {
-		lock.writeLock().lock();
-		try {
-			if (orderId.startsWith("BID")) {
-				Iterator<Map.Entry<Double, LinkedList<Order>>> mapIterator = bidMap.entrySet().iterator();
-				while(mapIterator.hasNext()) {
-					Map.Entry<Double, LinkedList<Order>> tmpMap = mapIterator.next();
-					ListIterator<Order> llIterator = tmpMap.getValue().listIterator();
-					while(llIterator.hasNext()) {
-						Order iteratorOrder = llIterator.next(); 
-						if(iteratorOrder.getId().equalsIgnoreCase(orderId)) {
-							iteratorOrder.setQuantity(newQuantity);
-						}
-					}
-				} // removes all objects from the map with empty values
-				bidMap.values().remove(new LinkedList<>());
-			}			
-
-			if (orderId.startsWith("ASK")) {
-				Iterator<Map.Entry<Double, LinkedList<Order>>> mapIterator = askMap.entrySet().iterator();
-				while(mapIterator.hasNext()) {
-					Map.Entry<Double, LinkedList<Order>> tmpMap = mapIterator.next();
-					ListIterator<Order> llIterator = tmpMap.getValue().listIterator();
-					while(llIterator.hasNext()) {
-						Order iteratorOrder = llIterator.next(); 
-						if(iteratorOrder.getId().equalsIgnoreCase(orderId)) {
-							iteratorOrder.setQuantity(newQuantity);
-						}
-					}
-				}// removes all objects from the map with empty values
-				askMap.values().remove(new LinkedList<>());
-			}
-		} finally {
-			lock.writeLock().unlock();
-		}// checking if any order was modified, then send a successful response back, else failure response back
-	}
 
 	public LinkedList<Order> SearchPrice(TreeMap<Double, LinkedList<Order>> bidMap, TreeMap<Double, LinkedList<Order>> askMap, boolean side, double price) {
 		if (side) {
