@@ -26,13 +26,65 @@ public class MatchingEngine {
 					System.out.println("There are no more buy orders to sell.");
 					return false;
 				}
-				IterateRemoveLogic(bidMap, order, tmpOrder);
+				Iterator<Map.Entry<Double, LinkedList<Order>>> mapIterator = bidMap.entrySet().iterator();
+				while (mapIterator.hasNext()) {
+					if (order.getPrice() <= bidMap.firstKey()) {
+						Map.Entry<Double, LinkedList<Order>> tmpMap = mapIterator.next();
+						ListIterator<Order> llIterator = tmpMap.getValue().listIterator();
+						while (llIterator.hasNext()) {
+							tmpOrder = llIterator.next();
+							int newQuantity = order.getQuantity() - tmpOrder.getQuantity();
+							if (newQuantity == 0) {
+								llIterator.remove();
+								break;
+							} else if (newQuantity > 0) {
+								llIterator.remove();
+								order.setQuantity(newQuantity);
+							} else {
+								newQuantity = newQuantity * (-1);
+								tmpOrder.setQuantity(newQuantity);
+								break;
+							}
+						}
+						if (tmpMap.getValue().isEmpty()) {
+							mapIterator.remove();
+						}
+					} else {
+						break;
+					}
+				}
 			} else { // If it is a buy limit order we subtract from the ask side
 				if (askMap.isEmpty()) {
 					System.out.println("There are no more sell orders to buy.");
 					return false;
 				}
-				IterateRemoveLogic(askMap, order, tmpOrder);
+				Iterator<Map.Entry<Double, LinkedList<Order>>> mapIterator = askMap.entrySet().iterator();
+				while (mapIterator.hasNext()) {
+					if (order.getPrice() >= askMap.firstKey()) {
+						Map.Entry<Double, LinkedList<Order>> tmpMap = mapIterator.next();
+						ListIterator<Order> llIterator = tmpMap.getValue().listIterator();
+						while (llIterator.hasNext()) {
+							tmpOrder = llIterator.next();
+							int newQuantity = order.getQuantity() - tmpOrder.getQuantity();
+							if (newQuantity == 0) {
+								llIterator.remove();
+								break;
+							} else if (newQuantity > 0) {
+								llIterator.remove();
+								order.setQuantity(newQuantity);
+							} else {
+								newQuantity = newQuantity * (-1);
+								tmpOrder.setQuantity(newQuantity);
+								break;
+							}
+						}
+						if (tmpMap.getValue().isEmpty()) {
+							mapIterator.remove();
+						}
+					} else {
+						break;
+					}
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -43,35 +95,5 @@ public class MatchingEngine {
 			lock.writeLock().unlock();
 		}
 		return true;
-	}
-
-	private void IterateRemoveLogic(TreeMap<Double, LinkedList<Order>> map, Order order, Order tmpOrder) {
-		Iterator<Map.Entry<Double, LinkedList<Order>>> mapIterator = map.entrySet().iterator();
-		while (mapIterator.hasNext()) {
-			if (order.getPrice() >= map.firstKey()) {
-				Map.Entry<Double, LinkedList<Order>> tmpMap = mapIterator.next();
-				ListIterator<Order> llIterator = tmpMap.getValue().listIterator();
-				while (llIterator.hasNext()) {
-					tmpOrder = llIterator.next(); 
-					int newQuantity = order.getQuantity() - tmpOrder.getQuantity();
-					if (newQuantity == 0) {
-						llIterator.remove();
-						break;
-					} else if (newQuantity > 0) {
-						llIterator.remove();
-						order.setQuantity(newQuantity);
-					} else {
-						newQuantity = newQuantity * (-1);
-						tmpOrder.setQuantity(newQuantity);
-						break;
-					}
-				}
-				if (tmpMap.getValue().isEmpty()) {
-					mapIterator.remove();
-				}
-			} else {
-				break;
-			}
-		}
 	}
 }

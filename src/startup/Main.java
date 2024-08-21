@@ -1,5 +1,6 @@
 package startup;
 
+import java.util.Collections;
 import java.util.InputMismatchException;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -18,7 +19,7 @@ public class Main implements Runnable {
 	private Displays display = new Displays();
 	private TestData testData = new TestData();
 	private MatchingEngine matchingEngine = new MatchingEngine();
-	private TreeMap<Double, LinkedList<Order>> bid = new TreeMap<Double, LinkedList<Order>>();
+	private TreeMap<Double, LinkedList<Order>> bid = new TreeMap<Double, LinkedList<Order>>(Collections.reverseOrder()); //Creating a bid map in reverse order to the natural order
 	private TreeMap<Double, LinkedList<Order>> ask = new TreeMap<Double, LinkedList<Order>>();
 
 	public static void main(String[] args) {
