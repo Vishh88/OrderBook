@@ -14,7 +14,7 @@ public class TestData {
 	}
 	
 	public void LoadTestData(TreeMap<Double, LinkedList<Order>> bidMap, TreeMap<Double, LinkedList<Order>> askMap) {
-		
+		// method to generate test data
 		System.out.println("Generating Orders...");
 		for (int i = 0; i < 10; i++) {
 			operation.AddOrder(bidMap, askMap, orderGenerator.GenerateRandomOrder());
@@ -35,7 +35,7 @@ public class TestData {
 		bidMap.values().remove(new LinkedList<>());
 	}
 
-
+// used to generate new test data in bulk, instead of using the predefined data
 	public void GenerateOrders(TreeMap<Double, LinkedList<Order>> bidMap, TreeMap<Double, LinkedList<Order>> askMap, int bidCount, int askCount) {
 		for (int i=0; i<bidCount; i++) {
 			operation.AddOrder(bidMap, askMap, orderGenerator.GenerateSameSideOrder(true));

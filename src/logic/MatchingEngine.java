@@ -28,21 +28,21 @@ public class MatchingEngine {
 				}
 				Iterator<Map.Entry<Double, LinkedList<Order>>> mapIterator = bidMap.entrySet().iterator();
 				while (mapIterator.hasNext()) {
-					if (order.getPrice() <= bidMap.firstKey()) {
+					if (order.getPrice() <= bidMap.firstKey()) { //checking if the new order price is less than the highest price BID, if not, then the executed order does not exist
 						Map.Entry<Double, LinkedList<Order>> tmpMap = mapIterator.next();
 						ListIterator<Order> llIterator = tmpMap.getValue().listIterator();
 						while (llIterator.hasNext()) {
 							tmpOrder = llIterator.next();
-							int newQuantity = order.getQuantity() - tmpOrder.getQuantity();
-							if (newQuantity == 0) {
-								llIterator.remove();
-								break;
-							} else if (newQuantity > 0) {
-								llIterator.remove();
+							int newQuantity = order.getQuantity() - tmpOrder.getQuantity(); //sets the new quantity
+							if (newQuantity == 0) { //checks if the new quantity is zero, means it perfectly matched with an existing order
+								llIterator.remove(); 
+								break; // we should break out of the loop here, it matched perfectly so there is no need to go to another order.
+							} else if (newQuantity > 0) { //checks if the new quantity is greater than zero means that the execute order has a greater quantity and we need to check the next order as well.  
+								llIterator.remove(); 
 								order.setQuantity(newQuantity);
-							} else {
-								newQuantity = newQuantity * (-1);
-								tmpOrder.setQuantity(newQuantity);
+							} else { //else if the new quantity is less than zero, means the current order has more quantity than what is left from the execute order.  We should break out of the loop here
+								newQuantity = newQuantity * (-1); // makes the new quantity positive and assigns it to the current order. 
+								tmpOrder.setQuantity(newQuantity); // this is updating the order and not modifying it, thus the order priority does not change
 								break;
 							}
 						}
@@ -60,9 +60,9 @@ public class MatchingEngine {
 				}
 				Iterator<Map.Entry<Double, LinkedList<Order>>> mapIterator = askMap.entrySet().iterator();
 				while (mapIterator.hasNext()) {
-					if (order.getPrice() >= askMap.firstKey()) {
+					if (order.getPrice() >= askMap.firstKey()) {//checking if the new order price is greater than the lowest price ASK, if not, then the executed order does not exist
 						Map.Entry<Double, LinkedList<Order>> tmpMap = mapIterator.next();
-						ListIterator<Order> llIterator = tmpMap.getValue().listIterator();
+						ListIterator<Order> llIterator = tmpMap.getValue().listIterator(); // same comments above will be used for the below iterations
 						while (llIterator.hasNext()) {
 							tmpOrder = llIterator.next();
 							int newQuantity = order.getQuantity() - tmpOrder.getQuantity();

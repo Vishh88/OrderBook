@@ -15,7 +15,7 @@ public class Displays {
 		System.out.format("+---------+----------------------------------------------------+%n");
 		System.out.format("| Price   | Quantity  HighestPriority -----> LowestPriority    |%n");
 		System.out.format("+---------+----------------------------------------------------+%n");
-		String leftAlignment = "| %-7.2f |";
+		String leftAlignment = "| %-7.2f |";  //using string format to display the data in the same format
 		for (Map.Entry<Double, LinkedList<Order>> entry : map.entrySet()) {
 			System.out.format(leftAlignment, entry.getKey());
 			for (Order order : entry.getValue()) {
@@ -51,7 +51,7 @@ public class Displays {
 		System.out.format("| Price   | Orders                                             |%n");
 		System.out.format("+---------+----------------------------------------------------+%n");
 		String leftAlignment = "| %-7s | %-7.100s |%n";
-		for (Map.Entry<Double, LinkedList<Order>> entry : map.entrySet()) {
+		for (Map.Entry<Double, LinkedList<Order>> entry : map.entrySet()) {  //iterate through the orders and print them out to screen to be viewed
 			for (Order order : entry.getValue()) {
 				System.out.format(leftAlignment, entry.getKey().toString(), order.toString());
 			}
