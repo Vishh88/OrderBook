@@ -22,17 +22,17 @@ public class Operations {
 		lock.writeLock().lock(); //write lock thread so that other thread won't be able to update while this thread is updating
 		try {
 			if (order.isSide()) { //check if order is a bid order before adding it to the BID TreeMap
-				if (!bidMap.containsKey(doubleObj)) {
+				if (!bidMap.containsKey(doubleObj)) {//check if bidMap already has the price as a Key, if not add the order and push a new key for this price
 					orderLinkedList.add(order);
 					bidMap.put(doubleObj, orderLinkedList);
-				} else {
+				} else {//if the key exists then just add the order to linked list value for this key
 					bidMap.get(doubleObj).add(order);
 				}
 			} else {
-				if (!askMap.containsKey(doubleObj)) {
+				if (!askMap.containsKey(doubleObj)) {//check if askMap already has the price as a Key, if not add the order and push a new key for this price
 					orderLinkedList.add(order);
 					askMap.put(doubleObj, orderLinkedList);
-				} else {
+				} else {//if the key exists then just add the order to linked list value for this key
 					askMap.get(doubleObj).add(order);
 				}
 			}
@@ -46,23 +46,22 @@ public class Operations {
 		boolean deleted = false;
 		lock.writeLock().lock();
 		try {
-			if (orderId.startsWith("BID")) {
+			if (orderId.startsWith("BID")) { // check if it is BID or ASK order reducing the need to unnecessarily iterate through both maps
 				Iterator<Map.Entry<Double, LinkedList<Order>>> mapIterator = bidMap.entrySet().iterator();
-				while(mapIterator.hasNext()) {
+				while(mapIterator.hasNext()) {//maps have a check to see if there is a next Key-Value pair
 					Map.Entry<Double, LinkedList<Order>> tmpMap = mapIterator.next();
-					ListIterator<Order> llIterator = tmpMap.getValue().listIterator();
-					while(llIterator.hasNext()) {
+					ListIterator<Order> llIterator = tmpMap.getValue().listIterator();// creating the listIterator to iterate through the linked list for this Key value
+					while(llIterator.hasNext()) { //ListIterator is used to iterate through all the orders of a list
 						Order iteratorOrder = llIterator.next(); 
 						if(iteratorOrder.getId().equalsIgnoreCase(orderId)) {
-							llIterator.remove();
+							llIterator.remove(); //ListIterator allows for removing an element while iterating through the collection
 							deleted = true;
 						}
 					}
 				}
 				bidMap.values().remove(new LinkedList<>());
 			}
-
-			if (orderId.startsWith("ASK")) {
+			else if (orderId.startsWith("ASK")) { // Check if the orderId starts with and ASK if it begins with anything other than BID or ASK the function will return a false and return an error
 				Iterator<Map.Entry<Double, LinkedList<Order>>> mapIterator = askMap.entrySet().iterator();
 				while(mapIterator.hasNext()) {
 					Map.Entry<Double, LinkedList<Order>> tmpMap = mapIterator.next();
@@ -109,8 +108,7 @@ public class Operations {
 				} // removes all objects from the map with empty values
 				bidMap.values().remove(new LinkedList<>());
 			}			
-
-			if (orderId.startsWith("ASK")) {
+			else if (orderId.startsWith("ASK")) {
 				Iterator<Map.Entry<Double, LinkedList<Order>>> mapIterator = askMap.entrySet().iterator();
 				while(mapIterator.hasNext()) {
 					Map.Entry<Double, LinkedList<Order>> tmpMap = mapIterator.next();

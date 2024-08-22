@@ -71,7 +71,7 @@ public class Main implements Runnable {
 					switch (choice) {
 					case 1:
 						testData.LoadTestData(bid, ask);
-						Thread.sleep(1000);
+						Thread.sleep(1000); // These pause steps are used to make the simulation look more human readable, like it is calculating or generating orders.  
 						System.out.println("Test data loaded successfully.");
 						break;
 					case 2:
@@ -99,7 +99,7 @@ public class Main implements Runnable {
 						newOrder.setSide(in.nextBoolean());
 						operations.AddOrder(bid, ask, newOrder);
 						System.out.println("Order " + newOrder + " added successfully.");
-						Thread.sleep(1000);
+						Thread.sleep(1000); // These pause steps are used to make the simulation look like it is calculating or generating orders.  
 						break;
 					case 4:
 						System.out.println("Please enter how many buy orders you would like to generate:");
@@ -161,7 +161,7 @@ public class Main implements Runnable {
 						System.out.println("Enter True or False");
 						executeOrder.setSide(in.nextBoolean());
 						if(matchingEngine.ExecuteOrder(bid, ask, executeOrder)) {
-							System.out.println("Execution of order " +executeOrder + " \nwas successfully.");
+							System.out.println("Execution of order was successfully.");
 						}
 						else {
 							System.out.println("Error Executing order, please try again.");
